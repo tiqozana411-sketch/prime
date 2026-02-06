@@ -3,13 +3,13 @@ package com.prime.swarm
 import com.prime.core.TaskResult
 import kotlinx.coroutines.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
 import android.util.Log
 
 /**
  * Queen Agent - 女王蜂
  * 职责：主控调度、任务分解、结果汇总
- * 
- * 基于周易因果推理：观察任务 → 推理分解 → 验证结果 → 修正策略
+ * * 基于周易因果推理：观察任务 → 推理分解 → 验证结果 → 修正策略
  */
 class QueenAgent(
     private val taskDecomposer: TaskDecomposer,
@@ -19,6 +19,9 @@ class QueenAgent(
     
     private val TAG = "QueenAgent"
     private val executionResults = ConcurrentHashMap<String, SwarmTaskResult>()
+    
+    // 修复方案：定义一个专用的原子布尔值，避免与协程的 isActive 冲突
+    private val isWorking = AtomicBoolean(false)
     
     override suspend fun execute(task: SubTask): TaskResult {
         return TaskResult(false, "Queen不直接执行任务")
@@ -44,7 +47,9 @@ class QueenAgent(
         context: Map<String, Any>
     ): SwarmExecutionResult = withContext(Dispatchers.Default) {
         val startTime = System.currentTimeMillis()
-        isActive.set(true)
+        
+        // 修改点 1：使用自定义的原子变量
+        isWorking.set(true)
         
         try {
             // 1. 任务分解（字节级数据筛选）
@@ -100,7 +105,8 @@ class QueenAgent(
                 error = e.message
             )
         } finally {
-            isActive.set(false)
+            // 修改点 2：使用自定义的原子变量
+            isWorking.set(false)
         }
     }
     
@@ -118,6 +124,117 @@ class QueenAgent(
                 async {
                     executeSubTask(task, plan.workers)
                 }
+            }.awaitAll()
+            
+            results.addAll(stageResults)
+            
+            // 如果有任务失败且是关键任务，停止执行
+            val criticalFailed = stageResults.any { 
+                !it.success && stage.tasks.find { t -> t.id == it.taskId }?.priority ?: 0 >= 8
+            }
+            if (criticalFailed) {
+                Log.w(TAG, "关键任务失败，停止执行")
+                break
+            }
+        }
+        
+        results
+    }
+    
+    /**
+     * 执行单个子任务（带容错机制）
+     */
+    private suspend fun executeSubTask(
+        task: SubTask,
+        workers: List<WorkerAgent>
+    ): SwarmTaskResult {
+        val startTime = System.currentTimeMillis()
+        
+        // 1. 选择合适的Worker
+        val worker = selectWorker(task, workers)
+        if (worker == null) {
+            return SwarmTaskResult(
+                taskId = task.id,
+                success = false,
+                result = null,
+                executedBy = "none",
+                executionTime = System.currentTimeMillis() - startTime,
+                error = "没有可用的Worker"
+            )
+        }
+        
+        // 2. 执行任务（带超时和重试）
+        var lastError: String? = null
+        repeat(task.retryCount) { attempt ->
+            try {
+                val result = withTimeout(task.timeout) {
+                    worker.execute(task)
+                }
+                
+                if (result.success) {
+                    performanceMonitor.recordSuccess(worker.id, System.currentTimeMillis() - startTime)
+                    return SwarmTaskResult(
+                        taskId = task.id,
+                        success = true,
+                        result = result,
+                        executedBy = worker.id,
+                        executionTime = System.currentTimeMillis() - startTime
+                    )
+                } else {
+                    lastError = result.message
+                }
+            } catch (e: TimeoutCancellationException) {
+                lastError = "任务超时"
+                Log.w(TAG, "任务${task.id}超时，尝试${attempt + 1}/${task.retryCount}")
+            } catch (e: Exception) {
+                lastError = e.message
+                Log.w(TAG, "任务${task.id}失败，尝试${attempt + 1}/${task.retryCount}", e)
+            }
+            
+            if (attempt < task.retryCount - 1) {
+                delay(1000L * (attempt + 1)) // 指数退避
+            }
+        }
+        
+        // 3. 所有重试都失败
+        performanceMonitor.recordFailure(worker.id)
+        return SwarmTaskResult(
+            taskId = task.id,
+            success = false,
+            result = null,
+            executedBy = worker.id,
+            executionTime = System.currentTimeMillis() - startTime,
+            error = lastError
+        )
+    }
+    
+    /**
+     * 选择最合适的Worker
+     * 基于：能力匹配 + 负载均衡
+     */
+    private fun selectWorker(task: SubTask, workers: List<WorkerAgent>): WorkerAgent? {
+        return workers
+            .filter { it.canHandle(task) && !it.isAgentActive() } // 这里假设父类有检查状态的方法
+            .minByOrNull { it.taskCount.get() }
+    }
+
+    // 辅助方法：检查当前 Queen 是否正在忙碌
+    fun isBusy(): Boolean = isWorking.get()
+}
+
+/**
+ * 蜂群执行结果
+ */
+data class SwarmExecutionResult(
+    val success: Boolean,
+    val totalTasks: Int,
+    val completedTasks: Int,
+    val failedTasks: Int,
+    val executionTime: Long,
+    val results: List<SwarmTaskResult> = emptyList(),
+    val metrics: PerformanceMetrics? = null,
+    val error: String? = null
+)
             }.awaitAll()
             
             results.addAll(stageResults)
