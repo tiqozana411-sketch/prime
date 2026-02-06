@@ -43,6 +43,22 @@ object RootManager {
         Timber.i("ROOT管理器初始化完成 - ROOT可用: $rootAvailable")
     }
     
+/**
+     * 是否有ROOT权限（属性版本，兼容旧代码）
+     */
+    val isRootAvailable: Boolean
+        get() = rootAvailable
+    
+    /**
+     * 检查ROOT权限（suspend版本）
+     */
+    suspend fun checkRoot(): Boolean {
+        if (!initialized) {
+            return false
+        }
+        return rootAvailable
+    }
+    
     /**
      * 是否有ROOT权限
      */

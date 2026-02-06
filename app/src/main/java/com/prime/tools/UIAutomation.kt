@@ -177,6 +177,13 @@ object UIAutomation {
         return success
     }
     
+/**
+     * 长按（别名，兼容 RemoteCommandHandler）
+     */
+    suspend fun longClick(x: Int, y: Int, duration: Int = 1000): Boolean {
+        return longPress(x, y, duration.toLong())
+    }
+    
     /**
      * 长按
      */

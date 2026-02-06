@@ -1,13 +1,18 @@
 package com.prime.swarm
 
+import android.content.Context
+import com.prime.core.PrimeController
+
 /**
  * 蜂群系统使用示例
+ * 注意：这些是示例代码，需要在实际Activity/Fragment中调用
+ * 下面的 context 参数需要从调用处传入
  */
 
 // ============================================
 // 示例1：简单登录任务
 // ============================================
-suspend fun example1_SimpleLogin() {
+suspend fun example1_SimpleLogin(context: Context) {
     val controller = PrimeController.getInstance(context)
     controller.initialize()
     
@@ -29,7 +34,7 @@ suspend fun example1_SimpleLogin() {
 // ============================================
 // 示例2：复杂搜索任务
 // ============================================
-suspend fun example2_ComplexSearch() {
+suspend fun example2_ComplexSearch(context: Context) {
     val controller = PrimeController.getInstance(context)
     
     val result = controller.executeTaskWithSwarm(
@@ -48,7 +53,7 @@ suspend fun example2_ComplexSearch() {
 // ============================================
 // 示例3：监控性能指标
 // ============================================
-fun example3_MonitorPerformance() {
+fun example3_MonitorPerformance(context: Context) {
     val controller = PrimeController.getInstance(context)
     val stats = controller.getStats()
     
@@ -73,7 +78,7 @@ fun example3_MonitorPerformance() {
 // ============================================
 // 示例4：对比单Agent和蜂群模式
 // ============================================
-suspend fun example4_ComparePerformance() {
+suspend fun example4_ComparePerformance(context: Context) {
     val controller = PrimeController.getInstance(context)
     
     // 单Agent模式
@@ -95,7 +100,7 @@ suspend fun example4_ComparePerformance() {
 // ============================================
 // 示例5：自定义任务分解
 // ============================================
-suspend fun example5_CustomTaskDecomposition() {
+suspend fun example5_CustomTaskDecomposition(context: Context) {
     val controller = PrimeController.getInstance(context)
     
     // 复杂的多步骤任务
@@ -108,22 +113,13 @@ suspend fun example5_CustomTaskDecomposition() {
         )
     )
     
-    // 任务会被自动分解为：
-    // 1. 点击朋友圈入口
-    // 2. 点击发布按钮
-    // 3. 输入文本
-    // 4. 选择图片1 (并发)
-    // 5. 选择图片2 (并发)
-    // 6. 选择位置
-    // 7. 点击发送
-    
     println("任务结果: ${result.message}")
 }
 
 // ============================================
 // 示例6：错误处理
 // ============================================
-suspend fun example6_ErrorHandling() {
+suspend fun example6_ErrorHandling(context: Context) {
     val controller = PrimeController.getInstance(context)
     
     val result = controller.executeTaskWithSwarm("登录微信")
@@ -145,14 +141,8 @@ suspend fun example6_ErrorHandling() {
 // ============================================
 // 示例7：性能自适应
 // ============================================
-suspend fun example7_PerformanceAdaptive() {
+suspend fun example7_PerformanceAdaptive(context: Context) {
     val controller = PrimeController.getInstance(context)
-    
-    // 蜂群系统会自动根据设备性能调整Worker数量
-    // 高性能设备: 5个Worker
-    // 中等设备: 3个Worker
-    // 低端设备: 2个Worker
-    // 极低端设备: 1个Worker
     
     val result = controller.executeTaskWithSwarm("登录微信")
     val metrics = controller.getStats()["swarmMetrics"] as? PerformanceMetrics
