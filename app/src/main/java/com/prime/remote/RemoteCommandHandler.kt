@@ -38,12 +38,12 @@ class RemoteCommandHandler(
                         uiAutomation.longPress(x, y, duration)
                     }
                     
-                    "swipe" -> {
+"swipe" -> {
                         val x1 = json.getInt("x1")
                         val y1 = json.getInt("y1")
                         val x2 = json.getInt("x2")
                         val y2 = json.getInt("y2")
-                        val duration = json.optInt("duration", 300)
+                        val duration = json.optInt("duration", 300).toLong()
                         uiAutomation.swipe(x1, y1, x2, y2, duration)
                     }
                     
