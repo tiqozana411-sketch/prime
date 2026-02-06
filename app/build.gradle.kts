@@ -74,10 +74,9 @@ dependencies {
     implementation("com.github.topjohnwu.libsu:core:5.2.2")
     implementation("com.github.topjohnwu.libsu:service:5.2.2")
     
-// RapidOCR - 使用 mavenCentral 上的版本
-    implementation("io.github.mymonstercat:rapidocr-onnx:0.0.3")
-    // OpenCV Android (QuickBird Studios)
-    implementation("com.quickbirdstudios:opencv:4.5.3.0")
+// OCR 依赖暂时禁用 (jitpack 需要认证)
+    // implementation("io.github.mymonstercat:rapidocr-onnx:0.0.3")
+    // implementation("com.quickbirdstudios:opencv:4.5.3.0")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.jakewharton.timber:timber:5.0.1")
     implementation("com.microsoft.onnxruntime:onnxruntime-android:1.16.3")
