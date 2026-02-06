@@ -29,7 +29,7 @@ object RootManager {
         Timber.i("初始化ROOT管理器...")
         
         // 配置libsu
-        Shell.enableVerboseLogging = BuildConfig.DEBUG
+        Shell.enableVerboseLogging = com.prime.BuildConfig.DEBUG
         Shell.setDefaultBuilder(
             Shell.Builder.create()
                 .setFlags(Shell.FLAG_REDIRECT_STDERR)

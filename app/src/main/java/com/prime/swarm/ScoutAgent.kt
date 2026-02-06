@@ -57,7 +57,7 @@ class ScoutAgent(
                 elements = elements,
                 layout = layout,
                 ocrText = ocrResult.text,
-                confidence = ocrResult.confidence
+                confidence = 0.8f // ocrResult.confidence 字段不存在，使用默认值
             )
             
         } catch (e: Exception) {

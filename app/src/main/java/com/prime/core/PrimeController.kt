@@ -191,10 +191,10 @@ class PrimeController private constructor(
         }
     }
     
-    /**
+/**
      * 获取统计数据
      */
-    fun getStats(): Map<String, Any> {
+    fun getStats(): Map<String, Any?> {
         return mapOf(
             "initialized" to isInitialized,
             "successRate" to adaptiveParams.getSuccessRate("task"),

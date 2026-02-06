@@ -103,11 +103,11 @@ class SwarmManager(
                 val taskStartTime = System.currentTimeMillis()
                 Log.d(TAG, "执行子任务 ${index + 1}/${subTasks.size}: ${task.description}")
                 
-                val result = try {
+val result = try {
                     worker.execute(task)
                 } catch (e: Exception) {
                     Log.e(TAG, "子任务执行异常: ${task.description}", e)
-                    TaskResult(false, "执行异常: ${e.message}", error = e)
+                    com.prime.core.TaskResult(false, "执行异常: ${e.message}", error = e)
                 }
                 
                 results.add(SwarmTaskResult(

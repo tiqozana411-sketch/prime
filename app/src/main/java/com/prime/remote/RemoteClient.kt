@@ -5,6 +5,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.OutputStream
 import java.net.Socket
+import org.json.JSONObject
 
 /**
  * 远程控制客户端
@@ -46,65 +47,59 @@ class RemoteClient(private val host: String, private val port: Int = 8888) {
      * 请求屏幕截图
      */
     suspend fun requestScreen() {
-        sendMessage(RemoteMessage(MessageType.REQUEST_SCREEN))
+        sendCommand("request_screen", emptyMap())
     }
     
     /**
      * 发送点击指令
      */
     suspend fun sendClick(x: Int, y: Int) {
-        sendMessage(RemoteMessage(
-            type = MessageType.CLICK,
-            data = mapOf("x" to x.toString(), "y" to y.toString())
-        ))
+        sendCommand("click", mapOf("x" to x.toString(), "y" to y.toString()))
     }
     
     /**
      * 发送滑动指令
      */
     suspend fun sendSwipe(direction: String) {
-        sendMessage(RemoteMessage(
-            type = MessageType.SWIPE,
-            data = mapOf("direction" to direction)
-        ))
+        sendCommand("swipe", mapOf("direction" to direction))
     }
     
     /**
      * 发送输入指令
      */
     suspend fun sendInput(text: String) {
-        sendMessage(RemoteMessage(
-            type = MessageType.INPUT,
-            data = mapOf("text" to text)
-        ))
+        sendCommand("input", mapOf("text" to text))
     }
     
     /**
      * 发送返回指令
      */
     suspend fun sendBack() {
-        sendMessage(RemoteMessage(MessageType.BACK))
+        sendCommand("back", emptyMap())
     }
     
     /**
      * 发送主页指令
      */
     suspend fun sendHome() {
-        sendMessage(RemoteMessage(MessageType.HOME))
+        sendCommand("home", emptyMap())
     }
     
     /**
-     * 发送消息
+     * 发送命令
      */
-    private suspend fun sendMessage(message: RemoteMessage) = withContext(Dispatchers.IO) {
+    private suspend fun sendCommand(action: String, data: Map<String, String>) = withContext(Dispatchers.IO) {
         if (!isConnected) {
             Timber.w("⚠️ 未连接到服务器")
             return@withContext
         }
         
         try {
-            val json = message.toJson()
-            output?.write(json.toByteArray())
+            val json = JSONObject().apply {
+                put("action", action)
+                data.forEach { (k, v) -> put(k, v) }
+            }
+            output?.write(json.toString().toByteArray())
             output?.flush()
         } catch (e: Exception) {
             Timber.e(e, "❌ 发送消息失败")

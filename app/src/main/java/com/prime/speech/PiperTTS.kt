@@ -146,7 +146,7 @@ override suspend fun release() {
             
             // 2. 创建输入张量
             val inputShape = longArrayOf(1, phonemeIds.size.toLong())
-            val inputBuffer = LongBuffer.wrap(phonemeIds.toLongArray())
+            val inputBuffer = LongBuffer.wrap(phonemeIds.map { it.toLong() }.toLongArray())
             val inputTensor = OnnxTensor.createTensor(ortEnv, inputBuffer, inputShape)
             
             // 3. 运行推理

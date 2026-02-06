@@ -136,10 +136,9 @@ object RemoteControlServer {
         return stream.toByteArray()
     }
     
-    companion object {
-        private const val CMD_SCREENSHOT = 1
-        private const val CMD_CLICK = 2
-        private const val CMD_SWIPE = 3
-        private const val CMD_INPUT = 4
-    }
+    // 常量定义（object 内不能用 companion）
+    private const val CMD_SCREENSHOT = 1
+    private const val CMD_CLICK = 2
+    private const val CMD_SWIPE = 3
+    private const val CMD_INPUT = 4
 }

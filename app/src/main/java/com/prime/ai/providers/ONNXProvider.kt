@@ -59,7 +59,7 @@ class ONNXProvider : AIProvider {
             
             // 2. 创建输入张量
             val inputShape = longArrayOf(1, tokenIds.size.toLong())
-            val inputBuffer = LongBuffer.wrap(tokenIds.toLongArray())
+            val inputBuffer = LongBuffer.wrap(tokenIds.map { it.toLong() }.toLongArray())
             val inputTensor = OnnxTensor.createTensor(ortEnv, inputBuffer, inputShape)
             
             // 3. 运行推理
