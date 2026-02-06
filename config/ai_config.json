@@ -1,0 +1,11 @@
+{
+  "provider": "rules",
+  "api_key": "",
+  "base_url": "",
+  "model": "",
+  "timeout": 30000,
+  "max_retries": 3,
+  "fallback": "rules",
+  "custom_headers": {},
+  "custom_body": {}
+}

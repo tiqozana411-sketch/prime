@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">PRIME</string>
+    <string name="accessibility_service_description">PRIME无障碍服务，用于监控应用事件和执行自动化任务</string>
+    <string name="ui_automation_service_description">PRIME UI自动化服务，用于执行点击、滑动等UI操作</string>
+</resources>

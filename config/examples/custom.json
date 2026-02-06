@@ -1,0 +1,22 @@
+{
+  "provider": "custom",
+  "api_key": "your-api-key",
+  "base_url": "https://your-api.com/v1/chat",
+  "model": "your-model",
+  "timeout": 30000,
+  "max_retries": 3,
+  "fallback": "rules",
+  "custom_headers": {
+    "X-Custom-Header": "value"
+  },
+  "custom_body": {
+    "model": "{{model}}",
+    "messages": [
+      {
+        "role": "user",
+        "content": "{{prompt}}"
+      }
+    ],
+    "temperature": 0.7
+  }
+}

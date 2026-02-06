@@ -1,0 +1,21 @@
+{
+  "provider": "custom",
+  "api_key": "your-api-key-here",
+  "base_url": "https://your-api.com/v1/chat",
+  "model": "your-model-name",
+  "timeout": 30000,
+  "max_retries": 3,
+  "fallback": "rules",
+  
+  "custom_headers": {
+    "X-Custom-Header": "value",
+    "Authorization": "Bearer your-token"
+  },
+  
+  "custom_body": {
+    "model": "{{model}}",
+    "prompt": "{{prompt}}",
+    "temperature": 0.7,
+    "max_tokens": 2000
+  }
+}
